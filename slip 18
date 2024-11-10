@@ -1,0 +1,119 @@
+Q1. Write a Program to Implement Breadth First Search using Python.
+from collections import deque
+
+class Graph:
+    def __init__(self):
+        self.graph = {}
+    
+    def add_edge(self, u, v):
+        if u not in self.graph:
+            self.graph[u] = []
+        self.graph[u].append(v)
+    
+    def bfs(self, start):
+        visited = set()
+        queue = deque([start])
+        
+        while queue:
+            node = queue.popleft()
+            if node not in visited:
+                print(node, end=' ')
+                visited.add(node)
+                for neighbor in self.graph.get(node, []):
+                    if neighbor not in visited:
+                        queue.append(neighbor)
+
+# Initialize the graph
+g = Graph()
+
+# Define the edges of the graph (example)
+edges = [
+    (0, 1), (0, 2), (1, 2), (2, 0), (2, 3), (3, 3)
+]
+
+# Add edges to the graph
+for u, v in edges:
+    g.add_edge(u, v)
+
+# Perform BFS starting from node 2
+start_node = 2
+g.bfs(start_node)
+
+Q2. Write a Program to Implement Tic-Tac-Toe game using Python.
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 5)
+
+def check_winner(board):
+    for row in board:
+        if row[0] == row[1] == row[2] and row[0] != ' ':
+            return row[0]
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != ' ':
+            return board[0][col]
+    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != ' ':
+        return board[0][0]
+    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != ' ':
+        return board[0][2]
+    return None
+
+def is_board_full(board):
+    for row in board:
+        for cell in row:
+            if cell == ' ':
+                return False
+    return True
+
+def tic_tac_toe():
+    board = [[' ' for _ in range(3)] for _ in range(3)]
+    current_player = 'X'
+    winner = None
+
+    while not winner and not is_board_full(board):
+        print_board(board)
+        row = int(input(f"Player {current_player}, enter the row (0, 1, or 2): "))
+        col = int(input(f"Player {current_player}, enter the column (0, 1, or 2): "))
+        
+        if board[row][col] == ' ':
+            board[row][col] = current_player
+            winner = check_winner(board)
+            current_player = 'O' if current_player == 'X' else 'X'
+        else:
+            print("Cell is already taken. Try again.")
+
+    print_board(board)
+    if winner:
+        print(f"Player {winner} wins!")
+    else:
+        print("It's a tie!")
+
+if __name__ == "__main__":
+    tic_tac_toe()
+
+           OR
+Q2. Develop a FAQ Bot for a University Website (This chatbot can help students with common questions about admissions, course registration, or contact details.)  
+def faq_bot():
+    faqs = {
+        "admissions": "You can apply for admission online through our university website. The admission process includes submitting your application, transcripts, and other required documents. For more details, visit the admissions page on our website.",
+        "course registration": "Course registration is done through the university's student portal. You can log in with your student credentials and select the courses you want to register for. For more assistance, visit the course registration page on our website.",
+        "contact details": "You can contact the university's main office at (123) 456-7890 or email us at info@university.edu. For specific departments, visit the contact us page on our website.",
+        "financial aid": "Financial aid is available for eligible students. You can apply for financial aid through the financial aid office. For more information, visit the financial aid page on our website.",
+        "campus tours": "Campus tours are available for prospective students. You can schedule a tour through the university's website or contact the admissions office for more details.",
+    }
+
+    print("Welcome to the University FAQ Bot!")
+    print("How can I help you today? You can ask about admissions, course registration, contact details, financial aid, or campus tours.")
+    
+    while True:
+        query = input("You: ").lower()
+        if query in faqs:
+            print("Bot:", faqs[query])
+        elif query == "exit":
+            print("Bot: Goodbye! Have a great day!")
+            break
+        else:
+            print("Bot: I'm sorry, I don't have information on that topic. Please ask about admissions, course registration, contact details, financial aid, or campus tours.")
+
+if __name__ == "__main__":
+    faq_bot()
