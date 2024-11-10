@@ -1,0 +1,110 @@
+Q1. Write a Python program to implement Depth First Search algorithm. Refer the following graph as an Input for the program. [Initial node=1,Goal node=8]
+def dfs(graph, start, goal, path=None):
+    if path is None:
+        path = []
+    path.append(start)
+    if start == goal:
+        return path
+    for neighbor in graph[start]:
+        if neighbor not in path:
+            result = dfs(graph, neighbor, goal, path)
+            if result:
+                return result
+    path.pop()
+    return None
+
+# Define the graph as an adjacency list
+graph = {
+    1: [2, 3, 4],
+    2: [5, 6],
+    3: [],
+    4: [7, 8],
+    5: [],
+    6: [],
+    7: [],
+    8: []
+}
+
+# Initial and Goal nodes
+start_node = 1
+goal_node = 8
+
+# Perform DFS
+path = dfs(graph, start_node, goal_node)
+if path:
+    print(f"Path from {start_node} to {goal_node}: {path}")
+else:
+    print(f"No path found from {start_node} to {goal_node}")
+
+Q2. Write a Program to Implement Alpha-Beta Pruning using Python.
+def alpha_beta_pruning(node, depth, alpha, beta, maximizing_player):
+    if depth == 0 or node.is_terminal():
+        return node.value
+
+    if maximizing_player:
+        max_eval = float('-inf')
+        for child in node.children:
+            eval = alpha_beta_pruning(child, depth - 1, alpha, beta, False)
+            max_eval = max(max_eval, eval)
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+        return max_eval
+    else:
+        min_eval = float('inf')
+        for child in node.children:
+            eval = alpha_beta_pruning(child, depth - 1, alpha, beta, True)
+            min_eval = min(min_eval, eval)
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+        return min_eval
+
+class Node:
+    def __init__(self, value=None):
+        self.value = value
+        self.children = []
+
+    def is_terminal(self):
+        return self.value is not None
+
+# Example usage
+root = Node()
+child1 = Node()
+child2 = Node()
+child1.children = [Node(3), Node(5), Node(6)]
+child2.children = [Node(9), Node(1), Node(2)]
+root.children = [child1, child2]
+
+result = alpha_beta_pruning(root, 3, float('-inf'), float('inf'), True)
+print("The optimal value is:", result)
+
+            OR
+Q2. Develop a Restaurant Reservation Assistant (A simple chatbot that helps customers make reservations or ask about the menu.)     
+class RestaurantReservationAssistant:
+    def __init__(self):
+        self.tables = [True] * 10  # Assume we have 10 tables initially available
+
+    def make_reservation(self, name):
+        for i in range(len(self.tables)):
+            if self.tables[i]:
+                self.tables[i] = False
+                print(f"Reservation made for {name} at table {i + 1}.")
+                return
+        print("Sorry, no tables available.")
+
+    def show_menu(self):
+        menu = {
+            "Pizza": 12.99,
+            "Burger": 8.99,
+            "Salad": 6.99,
+            "Pasta": 11.99
+        }
+        for item, price in menu.items():
+            print(f"{item}: ${price:.2f}")
+
+# Example usage
+assistant = RestaurantReservationAssistant()
+assistant.show_menu()
+assistant.make_reservation("John Doe")
+assistant.make_reservation("Jane Doe")
