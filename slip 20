@@ -1,0 +1,180 @@
+Q1. Write a Program to Implement Depth First Search using Python.
+class Graph:
+    def __init__(self):
+        self.graph = {}
+    
+    def add_edge(self, u, v):
+        if u not in self.graph:
+            self.graph[u] = []
+        self.graph[u].append(v)
+    
+    def dfs(self, start):
+        visited = set()
+        self.dfs_util(start, visited)
+    
+    def dfs_util(self, node, visited):
+        visited.add(node)
+        print(node, end=' ')
+        
+        for neighbor in self.graph.get(node, []):
+            if neighbor not in visited:
+                self.dfs_util(neighbor, visited)
+
+# Initialize the graph
+g = Graph()
+
+# Define the edges of the graph (example)
+edges = [
+    (0, 1), (0, 2), (1, 2), (2, 0), (2, 3), (3, 3)
+]
+
+# Add edges to the graph
+for u, v in edges:
+    g.add_edge(u, v)
+
+# Perform DFS starting from node 2
+start_node = 2
+g.dfs(start_node)
+
+Q2. Write a program to implement AO* algorithm.
+class Graph:
+    def __init__(self):
+        self.graph = {}
+        self.heuristics = {}
+    
+    def add_edge(self, u, v, cost):
+        if u not in self.graph:
+            self.graph[u] = []
+        self.graph[u].append((v, cost))
+    
+    def set_heuristics(self, node, h):
+        self.heuristics[node] = h
+    
+    def ao_star(self, start):
+        open_nodes = {start}
+        closed_nodes = set()
+        parents = {start: None}
+        path_costs = {start: 0}
+        best_path = {}
+
+        while open_nodes:
+            current_node = min(open_nodes, key=lambda node: path_costs[node] + self.heuristics.get(node, 0))
+            open_nodes.remove(current_node)
+            closed_nodes.add(current_node)
+
+            if current_node not in self.graph:
+                continue
+
+            best_successors = []
+            for successor, cost in self.graph[current_node]:
+                if successor not in closed_nodes:
+                    open_nodes.add(successor)
+                best_successors.append((successor, cost + path_costs[current_node] + self.heuristics.get(successor, 0)))
+
+            best_successors.sort(key=lambda x: x[1])
+            best_path[current_node] = best_successors
+
+            for successor, total_cost in best_successors:
+                path_costs[successor] = min(path_costs.get(successor, float('inf')), total_cost - self.heuristics.get(successor, 0))
+
+        solution_path = []
+        node = start
+        while node in best_path:
+            solution_path.append(node)
+            node = best_path[node][0][0]
+
+        solution_path.append(node)
+        return solution_path
+
+# Example usage
+g = Graph()
+g.add_edge('A', 'B', 1)
+g.add_edge('A', 'C', 2)
+g.add_edge('B', 'D', 1)
+g.add_edge('B', 'E', 2)
+g.add_edge('C', 'F', 2)
+g.add_edge('C', 'G', 3)
+
+g.set_heuristics('A', 1)
+g.set_heuristics('B', 1)
+g.set_heuristics('C', 1)
+g.set_heuristics('D', 0)
+g.set_heuristics('E', 0)
+g.set_heuristics('F', 0)
+g.set_heuristics('G', 0)
+
+solution = g.ao_star('A')
+print("Solution Path:", solution)
+
+       OR
+Q2. Given a number of cities and the cost of connecting them, find the minimum cost to connect all
+cities. Use Kruskal's algorithm to solve.
+class Edge:
+    def __init__(self, u, v, weight):
+        self.u = u
+        self.v = v
+        self.weight = weight
+
+# Disjoint Set (Union-Find) class to help in Kruskal's algorithm
+class DisjointSet:
+    def __init__(self, vertices):
+        self.parent = {v: v for v in vertices}
+        self.rank = {v: 0 for v in vertices}
+
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])  # Path compression
+        return self.parent[u]
+
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
+        
+        if root_u != root_v:
+            # Union by rank
+            if self.rank[root_u] > self.rank[root_v]:
+                self.parent[root_v] = root_u
+            elif self.rank[root_u] < self.rank[root_v]:
+                self.parent[root_u] = root_v
+            else:
+                self.parent[root_v] = root_u
+                self.rank[root_u] += 1
+
+# Kruskal's algorithm function
+def kruskal(vertices, edges):
+    disjoint_set = DisjointSet(vertices)
+    mst = []
+    total_cost = 0
+
+    # Sort edges based on weight
+    edges = sorted(edges, key=lambda edge: edge.weight)
+
+    for edge in edges:
+        if disjoint_set.find(edge.u) != disjoint_set.find(edge.v):
+            disjoint_set.union(edge.u, edge.v)
+            mst.append(edge)
+            total_cost += edge.weight
+
+    return mst, total_cost
+
+# Define vertices and edges of the graph
+vertices = ['A', 'B', 'C', 'D', 'E']
+edges = [
+    Edge('A', 'B', 5),
+    Edge('A', 'D', 6),
+    Edge('B', 'D', 2),
+    Edge('B', 'C', 1),
+    Edge('D', 'C', 4),
+    Edge('D', 'E', 6),
+    Edge('C', 'E', 2)
+]
+
+# Execute Kruskal's algorithm
+mst, total_cost = kruskal(vertices, edges)
+
+# Output the MST and its total cost
+print("Edges in the Minimum Spanning Tree (MST):")
+for edge in mst:
+    print(f"{edge.u} - {edge.v} with weight {edge.weight}")
+
+print(f"Total cost of MST: {total_cost}")
