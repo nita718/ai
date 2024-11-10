@@ -1,0 +1,85 @@
+Q1. Given an array of integers, write a Python Program to sort the array in ascending order using Selection Sort.
+def selection_sort(arr):
+    for i in range(len(arr)):
+        min_idx = i
+        for j in range(i + 1, len(arr)):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+
+# Example usage
+arr = [64, 25, 12, 22, 11]
+sorted_arr = selection_sort(arr)
+print("Sorted array:", sorted_arr)
+
+Q2. Write a Python program to implement Breadth First Search algorithm. Refer the following graph as an Input for the program. [Initial node=1,Goal node=8]
+from collections import deque
+
+def bfs(graph, start, goal):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        vertex = queue.popleft()
+        if vertex == goal:
+            return True
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return False
+
+# Example graph
+graph = {
+    1: [2, 4],
+    2: [3, 5],
+    3: [7, 8],
+    4: [6],
+    5: [7],
+    6: [8],
+    7: [],
+    8: []
+}
+
+# Perform BFS from node 1 to node 8
+start_node = 1
+goal_node = 8
+found = bfs(graph, start_node, goal_node)
+print(f"Path from node {start_node} to node {goal_node} found: {found}")
+
+                          OR
+Q2. Write a Program to Implement Monkey Banana Problem using Python.
+class State:
+    def __init__(self, monkey, banana, has_banana):
+        self.monkey = monkey  # Position of the monkey (ground or on the box)
+        self.banana = banana  # Position of the banana (on the ceiling or with the monkey)
+        self.has_banana = has_banana  # Whether the monkey has the banana or not
+
+    def is_goal(self):
+        return self.has_banana
+
+    def get_next_states(self):
+        states = []
+        if self.monkey == 'ground' and not self.has_banana:
+            states.append(State('box', self.banana, self.has_banana))
+        if self.monkey == 'box' and self.banana == 'ceiling':
+            states.append(State('box', 'ground', True))
+        return states
+
+def solve_monkey_banana():
+    initial_state = State('ground', 'ceiling', False)
+    frontier = [initial_state]
+    while frontier:
+        state = frontier.pop(0)
+        if state.is_goal():
+            return True
+        next_states = state.get_next_states()
+        frontier.extend(next_states)
+    return False
+
+if solve_monkey_banana():
+    print("Monkey got the banana!")
+else:
+    print("Monkey did not get the banana.")
