@@ -1,0 +1,85 @@
+Q1. Implement Dijkstra's Algorithm to find the shortest path from a single source for the following  graph G. [10 Marks]  
+import heapq
+
+# Graph represented using an adjacency list
+graph_dijkstra = {
+    'A': [('B', 4), ('C', 5)],
+    'B': [('A', 4), ('D', 9), ('E', 7)],
+    'C': [('A', 5), ('E', 3)],
+    'D': [('B', 9), ('F', 2)],
+    'E': [('B', 7), ('C', 3), ('F', 13)],
+    'F': [('D', 2), ('E', 13)]
+}
+
+def dijkstra(graph, start):
+    # Distance dictionary with initial distances set to infinity
+    distances = {node: float('inf') for node in graph}
+    distances[start] = 0  # Start node has a distance of 0
+    priority_queue = [(0, start)]  # Priority queue to get the node with minimum distance
+
+    while priority_queue:
+        current_distance, current_node = heapq.heappop(priority_queue)
+
+        # Only continue if this is the shortest recorded distance to the node
+        if current_distance > distances[current_node]:
+            continue
+
+        # Check neighbors
+        for neighbor, weight in graph[current_node]:
+            distance = current_distance + weight
+
+            # If a shorter path to neighbor is found
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(priority_queue, (distance, neighbor))
+
+    return distances
+
+# Example usage of Dijkstra's Algorithm starting from node 'A'
+dijkstra_result = dijkstra(graph_dijkstra, 'A')
+print("Shortest paths from node A:", dijkstra_result)
+
+Q2. Write a Python program to implement Depth First Search algorithm. Refer the following graph  as an input for the program. [Initial node=1,Goal node=8] [20 Marks] 
+# Graph represented as an adjacency list
+graph_dfs = {
+    1: [2, 3],
+    2: [1, 4, 5],
+    3: [1, 6, 7],
+    4: [2, 8],
+    5: [2, 8],
+    6: [3, 8],
+    7: [3, 8],
+    8: [4, 5, 6, 7]
+}
+
+def dfs(graph, start, goal, path=None, visited=None):
+    if path is None:
+        path = []
+    if visited is None:
+        visited = set()
+
+    # Add the current node to the path and mark it as visited
+    path.append(start)
+    visited.add(start)
+
+    # If we have reached the goal node, return the path
+    if start == goal:
+        return path
+
+    # Recursive DFS on all unvisited neighbors
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            result = dfs(graph, neighbor, goal, path, visited)
+            if result:  # If a path is found, return it
+                return result
+
+    # Backtrack if no path is found
+    path.pop()
+    return None
+
+# Example usage of DFS from node 1 to node 8
+dfs_path_result = dfs(graph_dfs, 1, 8)
+print("Path from node 1 to node 8 using DFS:", dfs_path_result)
+
+  
+
