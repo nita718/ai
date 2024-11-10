@@ -1,0 +1,213 @@
+Q1. Given a number of cities and the cost of connecting them, find the minimum cost to connect all cities. Use Prim's algorithm to solve.
+import heapq
+
+def prim(graph, start):
+    mst = []  # Resulting minimum spanning tree
+    visited = set([start])
+    edges = [(cost, start, to) for to, cost in graph[start]]
+    heapq.heapify(edges)
+
+    while edges:
+        cost, frm, to = heapq.heappop(edges)
+        if to not in visited:
+            visited.add(to)
+            mst.append((frm, to, cost))
+
+            for to_next, cost in graph[to]:
+                if to_next not in visited:
+                    heapq.heappush(edges, (cost, to, to_next))
+    return mst
+
+# Example usage
+graph = {
+    1: [(2, 28), (6, 10)],
+    2: [(1, 28), (3, 16), (7, 14)],
+    3: [(2, 16), (4, 12)],
+    4: [(3, 12), (5, 22), (7, 18)],
+    5: [(4, 22), (6, 25), (7, 24)],
+    6: [(1, 10), (5, 25), (7, 18)],
+    7: [(2, 14), (4, 18), (5, 24), (6, 18)]
+}
+
+mst = prim(graph, 1)
+print("Minimum Spanning Tree and its cost:", mst)
+
+Q2. Write a program to implement A* algorithm.
+from queue import PriorityQueue
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def a_star(graph, start, goal):
+    open_set = PriorityQueue()
+    open_set.put((0, start))
+    came_from = {}
+    g_score = {node: float('inf') for node in graph}
+    g_score[start] = 0
+    f_score = {node: float('inf') for node in graph}
+    f_score[start] = heuristic(start, goal)
+
+    while not open_set.empty():
+        _, current = open_set.get()
+
+        if current == goal:
+            break
+
+        for neighbor, cost in graph[current]:
+            tentative_g_score = g_score[current] + cost
+            if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+                open_set.put((f_score[neighbor], neighbor))
+
+    return came_from
+
+# Example usage
+graph = {
+    (0, 0): [((0, 1), 1), ((1, 0), 1)],
+    (0, 1): [((0, 0), 1), ((1, 1), 1)],
+    (1, 0): [((0, 0), 1), ((1, 1), 1)],
+    (1, 1): [((1, 0), 1), ((0, 1), 1)]
+}
+
+start = (0, 0)
+goal = (1, 1)
+path = a_star(graph, start, goal)
+print("Path to goal:", path)
+
+          OR
+Q2. Write a Python program to implement Mini-Max Algorithm.
+# A simple Tic-Tac-Toe game with Mini-Max algorithm
+import math
+
+# Constants
+PLAYER_X = 'X'  # Maximizing player
+PLAYER_O = 'O'  # Minimizing player
+EMPTY = ' '  # Empty cell in the board
+
+# Function to check if a player has won
+def is_winner(board, player):
+    # All possible winning positions
+    winning_positions = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
+        [0, 4, 8], [2, 4, 6]  # Diagonals
+    ]
+    for position in winning_positions:
+        if all(board[i] == player for i in position):
+            return True
+    return False
+
+# Function to check if the board is full (no moves left)
+def is_board_full(board):
+    return all(cell != EMPTY for cell in board)
+
+# Function to evaluate the board
+def evaluate(board):
+    if is_winner(board, PLAYER_X):
+        return 1  # Maximizing player wins
+    elif is_winner(board, PLAYER_O):
+        return -1  # Minimizing player wins
+    return 0  # Draw or ongoing game
+
+# Mini-Max Algorithm
+def mini_max(board, depth, is_max_player):
+    # Evaluate the board at the current state
+    score = evaluate(board)
+    
+    # If Maximizing player (X) has won or Minimizing player (O) has won, return the score
+    if score == 1:
+        return score - depth  # Subtract depth to prioritize earlier wins
+    if score == -1:
+        return score + depth  # Add depth to prioritize later losses
+    
+    # If the board is full, it's a draw
+    if is_board_full(board):
+        return 0
+    
+    # Maximizing player (X) turn
+    if is_max_player:
+        best = -math.inf  # Start with the lowest possible value
+        # Try every possible move for X
+        for i in range(9):
+            if board[i] == EMPTY:
+                board[i] = PLAYER_X  # Make the move
+                best = max(best, mini_max(board, depth + 1, False))  # Minimize the opponent's score
+                board[i] = EMPTY  # Undo the move
+        return best
+    
+    # Minimizing player (O) turn
+    else:
+        best = math.inf  # Start with the highest possible value
+        # Try every possible move for O
+        for i in range(9):
+            if board[i] == EMPTY:
+                board[i] = PLAYER_O  # Make the move
+                best = min(best, mini_max(board, depth + 1, True))  # Maximize the player's score
+                board[i] = EMPTY  # Undo the move
+        return best
+
+# Function to find the best move for the current player
+def find_best_move(board):
+    best_val = -math.inf
+    best_move = -1
+
+    # Try every possible move for X (the maximizing player)
+    for i in range(9):
+        if board[i] == EMPTY:
+            board[i] = PLAYER_X  # Make the move
+            move_val = mini_max(board, 0, False)  # Minimize the opponent's score
+            board[i] = EMPTY  # Undo the move
+            if move_val > best_val:
+                best_val = move_val
+                best_move = i
+    return best_move
+
+# Function to print the board
+def print_board(board):
+    print("\nBoard:")
+    for i in range(0, 9, 3):
+        print(board[i:i+3])
+
+# Function to play the game
+def play_game():
+    board = [EMPTY] * 9  # Initial empty board
+    current_player = PLAYER_X
+    
+    print("Welcome to Tic-Tac-Toe!")
+    
+    while True:
+        print_board(board)
+        
+        if current_player == PLAYER_X:
+            print("Player X's turn (Maximizing player).")
+            move = find_best_move(board)
+            board[move] = PLAYER_X
+        else:
+            print("Player O's turn (Minimizing player).")
+            move = int(input("Enter your move (0-8): "))
+            if board[move] != EMPTY:
+                print("Invalid move. Try again.")
+                continue
+            board[move] = PLAYER_O
+        
+        # Check for a winner or draw
+        if is_winner(board, PLAYER_X):
+            print_board(board)
+            print("Player X wins!")
+            break
+        elif is_winner(board, PLAYER_O):
+            print_board(board)
+            print("Player O wins!")
+            break
+        elif is_board_full(board):
+            print_board(board)
+            print("It's a draw!")
+            break
+        
+        # Switch players
+        current_player = PLAYER_O if current_player == PLAYER_X else PLAYER_X
+
+if __name__ == "__main__":
+    play_game()
