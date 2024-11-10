@@ -80,6 +80,70 @@ def dfs(graph, start, goal, path=None, visited=None):
 # Example usage of DFS from node 1 to node 8
 dfs_path_result = dfs(graph_dfs, 1, 8)
 print("Path from node 1 to node 8 using DFS:", dfs_path_result)
+ 
+            OR
+Q2. Write a Program to Implement Monkey Banana Problem using Python.
+class MonkeyBananaProblem:
+    def __init__(self):
+        # Initial state
+        self.monkey_position = "at_door"  # Options: at_door, at_middle, at_box
+        self.box_position = "middle_of_room"  # Options: middle_of_room, under_banana
+        self.monkey_on_box = False
+        self.has_banana = False
+
+    def move(self, position):
+        """ Move the monkey to a specified position """
+        print(f"Monkey moves to {position}.")
+        self.monkey_position = position
+
+    def push_box(self):
+        """ Push the box under the banana if monkey is at the box position """
+        if self.monkey_position == "at_box" and self.box_position != "under_banana":
+            print("Monkey pushes the box under the banana.")
+            self.box_position = "under_banana"
+        else:
+            print("Monkey cannot push the box from here.")
+
+    def climb_box(self):
+        """ Climb on the box if it is under the banana """
+        if self.monkey_position == "at_box" and self.box_position == "under_banana":
+            print("Monkey climbs on the box.")
+            self.monkey_on_box = True
+        else:
+            print("Monkey cannot climb the box from here.")
+
+    def grab_banana(self):
+        """ Grab the banana if the monkey is on the box under the banana """
+        if self.monkey_on_box and self.box_position == "under_banana":
+            print("Monkey grabs the banana!")
+            self.has_banana = True
+        else:
+            print("Monkey cannot reach the banana from here.")
+
+    def solve(self):
+        """ Solve the Monkey Banana Problem """
+        # Step 1: Move to the box
+        self.move("at_box")
+
+        # Step 2: Push the box under the banana
+        self.push_box()
+
+        # Step 3: Climb on the box
+        self.climb_box()
+
+        # Step 4: Grab the banana
+        self.grab_banana()
+
+        # Check if the goal is achieved
+        if self.has_banana:
+            print("Monkey successfully got the banana!")
+        else:
+            print("Monkey failed to get the banana.")
+
+# Run the Monkey Banana Problem solver
+problem = MonkeyBananaProblem()
+problem.solve()
+
 
   
 
