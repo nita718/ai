@@ -1,0 +1,154 @@
+Q1. Write a Python program to implement Depth First Search algorithm. Refer the following graph as an Input for the program. [Initial node=1,Goal node=8].
+def dfs(graph, start, goal, path=None):
+    if path is None:
+        path = []
+    path.append(start)
+    if start == goal:
+        return path
+    for neighbor in graph[start]:
+        if neighbor not in path:
+            result = dfs(graph, neighbor, goal, path)
+            if result:
+                return result
+    path.pop()
+    return None
+
+# Define the graph as an adjacency list
+graph = {
+    1: [2, 3, 4],
+    2: [5, 6],
+    3: [],
+    4: [7, 8],
+    5: [],
+    6: [],
+    7: [],
+    8: []
+}
+
+# Initial and Goal nodes
+start_node = 1
+goal_node = 8
+
+# Perform DFS
+path = dfs(graph, start_node, goal_node)
+if path:
+    print(f"Path from {start_node} to {goal_node}: {path}")
+else:
+    print(f"No path found from {start_node} to {goal_node}")
+    
+Q2. Write a Program to Implement Tic-Tac-Toe game using Python.
+def print_board(board):
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 5)
+
+def check_winner(board):
+    for row in board:
+        if row[0] == row[1] == row[2] and row[0] != ' ':
+            return row[0]
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != ' ':
+            return board[0][col]
+    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != ' ':
+        return board[0][0]
+    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != ' ':
+        return board[0][2]
+    return None
+
+def is_board_full(board):
+    for row in board:
+        for cell in row:
+            if cell == ' ':
+                return False
+    return True
+
+def tic_tac_toe():
+    board = [[' ' for _ in range(3)] for _ in range(3)]
+    current_player = 'X'
+    winner = None
+
+    while not winner and not is_board_full(board):
+        print_board(board)
+        row = int(input(f"Player {current_player}, enter the row (0, 1, or 2): "))
+        col = int(input(f"Player {current_player}, enter the column (0, 1, or 2): "))
+        
+        if board[row][col] == ' ':
+            board[row][col] = current_player
+            winner = check_winner(board)
+            current_player = 'O' if current_player == 'X' else 'X'
+        else:
+            print("Cell is already taken. Try again.")
+
+    print_board(board)
+    if winner:
+        print(f"Player {winner} wins!")
+    else:
+        print("It's a tie!")
+
+if __name__ == "__main__":
+    tic_tac_toe()
+
+           OR
+Q2. Given a number of cities and the cost of connecting them, find the minimum cost to connect all cities. Use Kruskal's algorithm to solve. 
+# Define the edges with weights (costs) between cities
+edges = [
+    ('A', 'B', 4),
+    ('A', 'G', 15),
+    ('B', 'G', 8),
+    ('B', 'C', 5),
+    ('C', 'G', 7),
+    ('C', 'D', 12),
+    ('C', 'F', 10),
+    ('D', 'E', 2),
+    ('E', 'F', 6),
+    ('F', 'G', 12)
+]
+
+# Union-Find helper functions
+def find(parent, i):
+    if parent[i] == i:
+        return i
+    else:
+        return find(parent, parent[i])
+
+def union(parent, rank, x, y):
+    root_x = find(parent, x)
+    root_y = find(parent, y)
+    if root_x != root_y:
+        if rank[root_x] > rank[root_y]:
+            parent[root_y] = root_x
+        elif rank[root_x] < rank[root_y]:
+            parent[root_x] = root_y
+        else:
+            parent[root_y] = root_x
+            rank[root_x] += 1
+
+# Kruskal's algorithm for Minimum Spanning Tree
+def kruskal(edges):
+    # Sort edges by weight
+    edges = sorted(edges, key=lambda item: item[2])
+    parent = {}
+    rank = {}
+    
+    # Initialize each node as its own parent (for union-find)
+    for u, v, _ in edges:
+        parent[u] = u
+        parent[v] = v
+        rank[u] = 0
+        rank[v] = 0
+
+    mst = []
+    mst_cost = 0
+
+    for u, v, weight in edges:
+        if find(parent, u) != find(parent, v):
+            union(parent, rank, u, v)
+            mst.append((u, v, weight))
+            mst_cost += weight
+
+    return mst, mst_cost
+
+# Example usage
+mst, cost = kruskal(edges)
+print("Minimum Spanning Tree:", mst)
+print("Minimum Cost:", cost)
