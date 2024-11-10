@@ -1,0 +1,116 @@
+Q1. Write a Program to Implement Breadth First Search using Python.
+from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        vertex = queue.popleft()
+        print(vertex, end=" ")
+
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+# Example usage
+graph = {
+    1: [2, 3],
+    2: [4],
+    3: [4, 5],
+    4: [6],
+    5: [6, 7],
+    6: [],
+    7: []
+}
+
+bfs(graph, 1)
+
+Q2. Implement AO star Algorithm.
+class AONode:
+    def __init__(self, name, is_and_node=False):
+        self.name = name
+        self.is_and_node = is_and_node
+        self.children = []
+        self.solution_cost = float('inf')
+        self.parent = None
+
+    def add_child(self, child, cost):
+        self.children.append((child, cost))
+        child.parent = self
+
+    def __repr__(self):
+        return f"AONode({self.name})"
+
+
+def ao_star(node):
+    if not node.children:
+        return node.solution_cost
+
+    open_list = [(child[0], child[1]) for child in node.children]
+    min_cost = float('inf')
+
+    for child, cost in open_list:
+        if node.is_and_node:
+            current_cost = cost + sum(ao_star(c[0]) for c in child.children)
+        else:
+            current_cost = cost + ao_star(child)
+
+        if current_cost < min_cost:
+            min_cost = current_cost
+
+    node.solution_cost = min_cost
+    return node.solution_cost
+
+
+# Example usage:
+# Creating the graph
+A = AONode('A', is_and_node=False)
+B = AONode('B', is_and_node=True)
+C = AONode('C', is_and_node=False)
+D = AONode('D', is_and_node=True)
+E = AONode('E', is_and_node=False)
+F = AONode('F', is_and_node=False)
+G = AONode('G', is_and_node=False)
+
+# Adding children with respective costs
+A.add_child((B, 2))
+A.add_child((C, 3))
+B.add_child((D, 1))
+B.add_child((E, 2))
+D.add_child((F, 4))
+D.add_child((G, 3))
+E.add_child((G, 1))
+
+# Calculating the AO* solution
+print(f"Solution Cost from A: {ao_star(A)}")
+
+               OR
+ Q2. Write a Program to Implement Depth First Search using Python.
+ def dfs(graph, vertex, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(vertex)
+    print(vertex, end=" ")
+
+    for neighbor in graph[vertex]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+
+# Example usage
+graph = {
+    1: [2, 3],
+    2: [4],
+    3: [4, 5],
+    4: [6],
+    5: [6, 7],
+    6: [],
+    7: []
+}
+
+# Starting DFS from vertex 1
+dfs(graph, 1)
+
+ 
