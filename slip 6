@@ -1,0 +1,128 @@
+Q1. Given an array of integers, write a Python Program to sort the array in descending order using Selection Sort.
+def selection_sort_descending(arr):
+    # Traverse through all elements in the array
+    n = len(arr)
+    for i in range(n):
+        # Find the index of the maximum element in the unsorted part of the array
+        max_index = i
+        for j in range(i + 1, n):
+            if arr[j] > arr[max_index]:
+                max_index = j
+        
+        # Swap the found maximum element with the first element of the unsorted part
+        arr[i], arr[max_index] = arr[max_index], arr[i]
+    
+    return arr
+
+# Example usage
+array = [64, 25, 12, 22, 11]
+sorted_array = selection_sort_descending(array)
+print("Sorted array in descending order:", sorted_array)
+
+Q2. Develop an elementary Chabot for any suitable customer interaction application.
+def chatbot():
+    print("Hello! I am your customer support assistant. How can I help you today?")
+    print("Type 'bye' to exit the chat.")
+
+    # Dictionary of responses
+    responses = {
+        "hello": "Hi there! How can I assist you today?",
+        "hi": "Hello! How can I help you?",
+        "help": "I'm here to help! You can ask me about our products, your order status, and more.",
+        "order": "Can you please provide your order number for more details?",
+        "status": "Checking order status... Please provide your order ID.",
+        "product": "We have a variety of products. Can you specify which one you're interested in?",
+        "return": "To initiate a return, please visit our Returns page or provide your order ID here.",
+        "refund": "Refunds are processed within 5-7 business days after the return is received.",
+        "bye": "Thank you for visiting! Have a great day!"
+    }
+
+    while True:
+        # Get user input and convert it to lowercase
+        user_input = input("You: ").lower()
+
+        if user_input == "bye":
+            print("Chatbot: " + responses["bye"])
+            break
+
+        # Check for keywords in the user's input
+        response_found = False
+        for keyword, response in responses.items():
+            if keyword in user_input:
+                print("Chatbot:", response)
+                response_found = True
+                break
+
+        # If no keyword matched, provide a generic response
+        if not response_found:
+            print("Chatbot: I'm sorry, I didn't understand that. Could you please rephrase?")
+
+# Start the chatbot
+chatbot()
+
+          OR
+Q2. Write a Program to Implement Water-Jug problem using Python.
+from collections import deque
+
+# Function to solve the Water Jug problem using BFS
+def water_jug_bfs(jug1_capacity, jug2_capacity, target):
+    # Queue for BFS
+    queue = deque()
+    # Set to store visited states
+    visited = set()
+
+    # Initialize queue with the starting state (0, 0)
+    queue.append((0, 0))
+    visited.add((0, 0))
+
+    while queue:
+        # Get the current state
+        jug1, jug2 = queue.popleft()
+        
+        # If either jug has the target amount, return the solution
+        if jug1 == target or jug2 == target:
+            return True
+        
+        # Possible next states
+        possible_states = set()
+        
+        # Fill Jug 1
+        possible_states.add((jug1_capacity, jug2))
+        
+        # Fill Jug 2
+        possible_states.add((jug1, jug2_capacity))
+        
+        # Empty Jug 1
+        possible_states.add((0, jug2))
+        
+        # Empty Jug 2
+        possible_states.add((jug1, 0))
+        
+        # Pour Jug 1 -> Jug 2
+        pour_to_jug2 = min(jug1, jug2_capacity - jug2)
+        possible_states.add((jug1 - pour_to_jug2, jug2 + pour_to_jug2))
+        
+        # Pour Jug 2 -> Jug 1
+        pour_to_jug1 = min(jug2, jug1_capacity - jug1)
+        possible_states.add((jug1 + pour_to_jug1, jug2 - pour_to_jug1))
+
+        # Explore each possible state
+        for state in possible_states:
+            if state not in visited:
+                visited.add(state)
+                queue.append(state)
+    
+    # If no solution was found
+    return False
+
+# Example usage
+jug1_capacity = 4
+jug2_capacity = 3
+target_amount = 2
+
+if water_jug_bfs(jug1_capacity, jug2_capacity, target_amount):
+    print("Solution found to measure", target_amount, "liters.")
+else:
+    print("No solution found.")
+
+          
