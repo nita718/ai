@@ -1,0 +1,167 @@
+Q1. Given a number of cities and the cost of connecting them, find the minimum cost to connect all cities. Use Prim's algorithm to solve.
+import heapq
+
+def prim(graph, start):
+    mst = []  # Resulting minimum spanning tree
+    visited = set([start])
+    edges = [(cost, start, to) for to, cost in graph[start]]
+    heapq.heapify(edges)
+
+    while edges:
+        cost, frm, to = heapq.heappop(edges)
+        if to not in visited:
+            visited.add(to)
+            mst.append((frm, to, cost))
+
+            for to_next, cost in graph[to]:
+                if to_next not in visited:
+                    heapq.heappush(edges, (cost, to, to_next))
+    return mst
+
+# Example usage
+graph = {
+    1: [(2, 28), (6, 10)],
+    2: [(1, 28), (3, 16), (7, 14)],
+    3: [(2, 16), (4, 12)],
+    4: [(3, 12), (5, 22), (7, 18)],
+    5: [(4, 22), (6, 25), (7, 24)],
+    6: [(1, 10), (5, 25), (7, 18)],
+    7: [(2, 14), (4, 18), (5, 24), (6, 18)]
+
+mst = prim(graph, 1)
+print("Minimum Spanning Tree and its cost:", mst)
+
+Q2. Write a python program to implement A star Algorithm.
+from queue import PriorityQueue
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def a_star(graph, start, goal):
+    open_set = PriorityQueue()
+    open_set.put((0, start))
+    came_from = {}
+    g_score = {node: float('inf') for node in graph}
+    g_score[start] = 0
+    f_score = {node: float('inf') for node in graph}
+    f_score[start] = heuristic(start, goal)
+
+    while not open_set.empty():
+        _, current = open_set.get()
+
+        if current == goal:
+            break
+
+        for neighbor, cost in graph[current]:
+            tentative_g_score = g_score[current] + cost
+            if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+                open_set.put((f_score[neighbor], neighbor))
+
+    return came_from
+
+# Example usage
+graph = {
+    (0, 0): [((0, 1), 1), ((1, 0), 1)],
+    (0, 1): [((0, 0), 1), ((1, 1), 1)],
+    (1, 0): [((0, 0), 1), ((1, 1), 1)],
+    (1, 1): [((1, 0), 1), ((0, 1), 1)]
+}
+
+start = (0, 0)
+goal = (1, 1)
+path = a_star(graph, start, goal)
+print("Path to goal:", path)
+
+            OR
+Q2. Write a program to solve Missionaries and Cannibals problem.
+from collections import deque
+
+# Function to check if a state is valid
+def is_valid_state(m_left, c_left, m_right, c_right):
+    # Check if there are more cannibals than missionaries on either side
+    if m_left < c_left and m_left > 0:
+        return False
+    if m_right < c_right and m_right > 0:
+        return False
+    return True
+
+# Function to print the solution path
+def print_solution(path):
+    for state in path:
+        print(f"Left: {state[0]} missionaries, {state[1]} cannibals | "
+              f"Right: {state[2]} missionaries, {state[3]} cannibals | "
+              f"Boat: {'Left' if state[4] == 0 else 'Right'}")
+
+# BFS to find the solution
+def bfs():
+    # Initial state: 3 missionaries, 3 cannibals on the left side, boat on the left
+    initial_state = (3, 3, 0, 0, 0)
+    
+    # Goal state: 0 missionaries, 0 cannibals on the left side, boat on the right
+    goal_state = (0, 0, 3, 3, 1)
+    
+    # Queue for BFS: stores the state and the path to reach that state
+    queue = deque([(initial_state, [])])
+    
+    # Set for visited states to avoid revisiting
+    visited = set([initial_state])
+    
+    # Possible moves: (missionaries_left, cannibals_left, missionaries_right, cannibals_right, boat_side)
+    moves = [
+        (1, 0, 0, 0, 1),  # Move 1 missionary
+        (0, 1, 0, 0, 1),  # Move 1 cannibal
+        (2, 0, 0, 0, 1),  # Move 2 missionaries
+        (0, 2, 0, 0, 1),  # Move 2 cannibals
+        (1, 1, 0, 0, 1),  # Move 1 missionary and 1 cannibal
+        (0, 0, 1, 0, 0),  # Move 1 missionary back
+        (0, 0, 0, 1, 0),  # Move 1 cannibal back
+        (0, 0, 2, 0, 0),  # Move 2 missionaries back
+        (0, 0, 0, 2, 0),  # Move 2 cannibals back
+        (1, 0, 1, 0, 0),  # Move 1 missionary and 1 cannibal back
+    ]
+    
+    # BFS loop
+    while queue:
+        (m_left, c_left, m_right, c_right, boat_side), path = queue.popleft()
+        
+        # If we reach the goal state, return the path to the goal
+        if (m_left, c_left, m_right, c_right, boat_side) == goal_state:
+            print_solution(path + [(m_left, c_left, m_right, c_right, boat_side)])
+            return
+        
+        # Explore the next states
+        for move in moves:
+            # If boat is on the left side, move the people to the right
+            if boat_side == 0:
+                new_m_left = m_left - move[0]
+                new_c_left = c_left - move[1]
+                new_m_right = m_right + move[0]
+                new_c_right = c_right + move[1]
+                new_boat_side = 1
+            else:
+                # If boat is on the right side, move the people to the left
+                new_m_left = m_left + move[0]
+                new_c_left = c_left + move[1]
+                new_m_right = m_right - move[0]
+                new_c_right = c_right - move[1]
+                new_boat_side = 0
+            
+            # Ensure the new state is valid
+            if new_m_left >= 0 and new_c_left >= 0 and new_m_right >= 0 and new_c_right >= 0:
+                if is_valid_state(new_m_left, new_c_left, new_m_right, new_c_right):
+                    new_state = (new_m_left, new_c_left, new_m_right, new_c_right, new_boat_side)
+                    # Avoid revisiting the same state
+                    if new_state not in visited:
+                        visited.add(new_state)
+                        queue.append((new_state, path + [(m_left, c_left, m_right, c_right, boat_side)]))
+    
+    print("No solution found.")
+
+# Main function to execute the BFS
+if __name__ == "__main__":
+    bfs()
+
+
