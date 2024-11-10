@@ -1,0 +1,134 @@
+Q1. Write a Python program to implement Depth First Search algorithm. Refer the following graph as an Input for the program. [Initial node=1, Goal node=8].
+# Graph represented as an adjacency list
+graph = {
+    1: [2, 3],
+    2: [4, 5],
+    3: [6, 7],
+    4: [],
+    5: [8],
+    6: [8],
+    7: [8],
+    8: []
+}
+
+# Depth First Search implementation
+def dfs(graph, start, goal, visited=None):
+    if visited is None:
+        visited = set()
+    
+    # Mark the current node as visited
+    visited.add(start)
+    print(start, end=" ")
+
+    # If the goal node is found, stop the search
+    if start == goal:
+        return True
+    
+    # Visit each neighbor
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            if dfs(graph, neighbor, goal, visited):
+                return True
+    return False
+
+# Example usage
+start_node = 1
+goal_node = 8
+print("DFS Path from node", start_node, "to node", goal_node, ":")
+dfs(graph, start_node, goal_node)
+
+Q2. Write a program to implement AO* algorithm.
+class Node:
+    def __init__(self, name, is_goal=False):
+        self.name = name
+        self.is_goal = is_goal
+        self.children = []  # AND-OR children
+        self.cost = float('inf')  # Initial cost is set to infinity
+        self.best_child = None  # Best child (if any)
+
+    def add_child(self, node, cost):
+        self.children.append((node, cost))
+
+def ao_star(node):
+    # Base case: return if node is a goal node
+    if node.is_goal:
+        node.cost = 0
+        return node.cost
+
+    # If node has children, recursively calculate cost
+    min_cost = float('inf')
+    for child, cost in node.children:
+        child_cost = ao_star(child)
+        total_cost = cost + child_cost
+        if total_cost < min_cost:
+            min_cost = total_cost
+            node.best_child = child
+
+    # Update the node's cost with the minimum cost found
+    node.cost = min_cost
+    return node.cost
+
+# Example usage
+n1 = Node('Start')
+n2 = Node('A')
+n3 = Node('B', is_goal=True)
+n4 = Node('C')
+n5 = Node('D', is_goal=True)
+
+# Add connections (AND-OR structure)
+n1.add_child(n2, 1)
+n1.add_child(n3, 2)
+n2.add_child(n4, 1)
+n2.add_child(n5, 2)
+
+# Calculate AO* solution
+print("AO* Algorithm:")
+cost = ao_star(n1)
+print(f"Minimum cost to goal: {cost}")
+print(f"Best child from start node: {n1.best_child.name}")
+
+                  OR
+Q2. Write a Program to Implement Water-Jug problem using Python.
+from collections import deque
+
+def water_jug_bfs(jug1_capacity, jug2_capacity, target):
+    # Initialize a queue and set of visited states
+    queue = deque([(0, 0)])  # Starting state with both jugs empty
+    visited = set((0, 0))
+    
+    while queue:
+        jug1, jug2 = queue.popleft()
+        
+        # Print the state
+        print(f"Jug1: {jug1}, Jug2: {jug2}")
+        
+        # Check if we reached the target
+        if jug1 == target or jug2 == target:
+            return True
+        
+        # Generate all possible moves
+        moves = [
+            (jug1_capacity, jug2),            # Fill jug1
+            (jug1, jug2_capacity),            # Fill jug2
+            (0, jug2),                        # Empty jug1
+            (jug1, 0),                        # Empty jug2
+            (min(jug1 + jug2, jug1_capacity), max(0, jug2 - (jug1_capacity - jug1))),  # Pour jug2 into jug1
+            (max(0, jug1 - (jug2_capacity - jug2)), min(jug1 + jug2, jug2_capacity))   # Pour jug1 into jug2
+        ]
+        
+        # Enqueue all valid moves
+        for new_jug1, new_jug2 in moves:
+            if (new_jug1, new_jug2) not in visited:
+                visited.add((new_jug1, new_jug2))
+                queue.append((new_jug1, new_jug2))
+                
+    return False
+
+# Example usage
+jug1_capacity = 4
+jug2_capacity = 3
+target = 2
+print("Water Jug Problem solution steps:")
+water_jug_bfs(jug1_capacity, jug2_capacity, target)
+
+         
