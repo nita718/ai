@@ -1,0 +1,135 @@
+Q1. Implement Dijkstra’s algorithm to find the shortest path from a source node to all other nodes in a weighted graph.
+import heapq
+
+def dijkstra(graph, start):
+    # Initialize distances with infinity for all nodes except the start node
+    distances = {node: float('infinity') for node in graph}
+    distances[start] = 0
+    
+    # Priority queue to store (distance, node)
+    priority_queue = [(0, start)]
+    
+    while priority_queue:
+        current_distance, current_node = heapq.heappop(priority_queue)
+        
+        # If we encounter a greater distance in the queue, skip it
+        if current_distance > distances[current_node]:
+            continue
+        
+        # Explore neighbors
+        for neighbor, weight in graph[current_node].items():
+            distance = current_distance + weight
+            
+            # Only consider this new path if it's better
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(priority_queue, (distance, neighbor))
+    
+    return distances
+
+# Example usage
+graph = {
+    'A': {'B': 1, 'C': 4},
+    'B': {'A': 1, 'D': 2, 'E': 5},
+    'C': {'A': 4, 'F': 3},
+    'D': {'B': 2, 'H': 7, 'I': 6},
+    'E': {'B': 5, 'I': 3},
+    'F': {'C': 3, 'G': 8, 'K': 2},
+    'G': {'F': 8},
+    'H': {'D': 7},
+    'I': {'D': 6, 'E': 3},
+    'K': {'F': 2}
+}
+
+# Start from node 'A'
+start_node = 'A'
+shortest_paths = dijkstra(graph, start_node)
+print("Shortest distances from node", start_node, ":", shortest_paths)
+
+Q2. Write a program to implement Iterative Deepening DFS algorithm. [20 Marks] [ Goal Node =G]
+def depth_limited_search(graph, start, goal, limit):
+    if start == goal:
+        return [start]
+    
+    if limit <= 0:
+        return None
+    
+    for neighbor in graph[start]:
+        path = depth_limited_search(graph, neighbor, goal, limit - 1)
+        if path is not None:
+            return [start] + path
+    
+    return None
+
+def iterative_deepening_dfs(graph, start, goal):
+    depth = 0
+    while True:
+        path = depth_limited_search(graph, start, goal, depth)
+        if path is not None:
+            return path
+        depth += 1
+
+# Graph structure from the given diagram
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F', 'G'],
+    'D': ['H', 'I'],
+    'E': [],
+    'F': [],
+    'G': ['K'],
+    'H': [],
+    'I': [],
+    'K': []
+}
+
+# Starting from node 'A' with the goal node 'G'
+start_node = 'A'
+goal_node = 'G'
+path_to_goal = iterative_deepening_dfs(graph, start_node, goal_node)
+
+print("Path to goal node", goal_node, ":", path_to_goal)
+
+                 OR
+Q2. Write a Program to Implement Travelling Salesman Problem using Python.
+from itertools import permutations
+
+def traveling_salesman(graph, start):
+    # List of all nodes except the start node
+    nodes = list(graph.keys())
+    nodes.remove(start)
+    
+    # Initialize minimum path variables
+    min_path_cost = float('inf')
+    best_path = []
+    
+    # Generate all permutations of nodes
+    for perm in permutations(nodes):
+        # Calculate the cost of the path starting and ending at the start node
+        current_cost = 0
+        current_path = [start] + list(perm) + [start]
+        
+        for i in range(len(current_path) - 1):
+            current_cost += graph[current_path[i]][current_path[i + 1]]
+        
+        # Update minimum path cost if this path is cheaper
+        if current_cost < min_path_cost:
+            min_path_cost = current_cost
+            best_path = current_path
+    
+    return min_path_cost, best_path
+
+# Example usage
+graph = {
+    'A': {'B': 10, 'C': 15, 'D': 20},
+    'B': {'A': 10, 'C': 35, 'D': 25},
+    'C': {'A': 15, 'B': 35, 'D': 30},
+    'D': {'A': 20, 'B': 25, 'C': 30}
+}
+
+# Start from node 'A'
+start_node = 'A'
+min_cost, best_route = traveling_salesman(graph, start_node)
+
+print("Minimum cost:", min_cost)
+print("Best route:", best_route)
